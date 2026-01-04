@@ -1,61 +1,85 @@
 # ❤️ Heart Disease – Exploratory Data Analysis (EDA)
 
-This project presents an **Exploratory Data Analysis (EDA)** of a heart disease dataset using **Python, Streamlit, Pandas, Matplotlib, and Seaborn**.  
-The goal is to explore clinical variables, identify patterns, and support future predictive modeling.
----
+This project presents an **Exploratory Data Analysis (EDA)** of a heart disease dataset using **Python** and **Streamlit**.  
+The goal is to analyze clinical variables, visualize relationships, and extract insights that may help understand cardiovascular risk patterns.
 
-[Heart Disease EDA](https://eda-heart-disease-inwh7rentomffqx6zbjs5y.streamlit.app)
-
----
-
-## 📌 Project Objectives
-
-- Understand the distribution of key clinical variables  
-- Analyze relationships between age, blood pressure, cholesterol, and heart disease  
-- Visualize correlations between numerical features  
-- Build an interactive and professional **Streamlit dashboard**
+👉 **Live App:** https://eda-heart-disease.streamlit.app  
+👉 **Source Code:** https://github.com/Guilhermestella29/EDA-Heart-Disease
 
 ---
 
-## 🛠️ Technologies Used
+## 📌 Project Overview
 
-- **Python**
-- **Streamlit**
-- **Pandas**
-- **Matplotlib**
-- **Seaborn**
+Cardiovascular diseases are among the leading causes of death worldwide.  
+This project explores a heart disease dataset through interactive visualizations, enabling:
+
+- Understanding distributions of clinical variables  
+- Identifying relationships between age, blood pressure, cholesterol, and other indicators  
+- Supporting future feature engineering and predictive modeling  
+
+The analysis is delivered as an **interactive Streamlit dashboard**, making the results accessible and easy to explore.
 
 ---
 
-## 📂 Dataset
+## 📊 Dataset
 
-The dataset (`heart.csv`) contains clinical data related to cardiovascular health, including:
+- **File:** `heart.csv`
+- **Type:** Structured clinical dataset
+- **Content:** Demographic and medical attributes related to heart disease
 
+### Main variables include:
 - Age  
 - Blood Pressure (BP)  
 - Cholesterol  
-- Maximum Heart Rate  
+- Maximum Heart Rate (Max HR)  
 - ST Depression  
 - Chest Pain Type  
 - Thallium Test  
 - Heart Disease (target variable)
 
----
-
-## 🚀 Application Features
-
-- Dataset overview and preview  
-- Descriptive statistics  
-- Age and blood pressure analysis  
-- Distribution of multiple clinical variables  
-- Age vs Cholesterol density visualization  
-- Correlation heatmap  
-- Key analytical insights
+> The dataset is included directly in the repository for reproducibility.
 
 ---
 
-## ▶️ How to Run the App
+## 🧠 Key Analyses Performed
 
-```bash
-pip install -r requirements.txt
-streamlit run aed.py
+- Descriptive statistics of clinical variables  
+- Age distribution and blood pressure trends  
+- Histograms of selected medical indicators  
+- Relationship between age and cholesterol using density plots  
+- Correlation analysis between numerical features  
+
+All visualizations are interactive and rendered dynamically using Streamlit.
+
+
+![Dashboard Preview](plot.png)
+
+
+---
+
+## 🖥️ Application Features
+
+- Interactive dashboards built with **Streamlit**
+- Responsive layout (desktop & mobile-friendly)
+- Cached data loading for faster performance
+- Clean and organized visualizations using **Matplotlib** and **Seaborn**
+
+---
+
+## 🛠️ Technologies Used
+
+- Python  
+- Pandas  
+- NumPy  
+- Matplotlib  
+- Seaborn  
+- Streamlit  
+
+---
+
+## 🚀 How to Run Locally
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Guilhermestella29/EDA-Heart-Disease.git
+   cd EDA-Heart-Disease
