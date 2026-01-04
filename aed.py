@@ -16,8 +16,8 @@ st.markdown("Análise interativa baseada no dataset de predição de doenças ca
 # =========================
 @st.cache_data
 
-os.environ["KAGGLE_USERNAME"] = st.secrets["KAGGLE_USERNAME"]
-os.environ["KAGGLE_KEY"] = st.secrets["KAGGLE_KEY"]
+os.environ["guilhermebstella"] = st.secrets["guilhermebstella"]
+os.environ["710d19fdcfada37e89085fc6dfdb5c52"] = st.secrets["710d19fdcfada37e89085fc6dfdb5c52"]
 
 os.system("kaggle datasets download -d johnsmith/heart-disease")
 with zipfile.ZipFile("heart-disease.zip", "r") as zip_ref:
