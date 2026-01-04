@@ -19,15 +19,7 @@ os.environ["KAGGLE_KEY"] = st.secrets["KAGGLE_KEY"]
 # =========================
 @st.cache_data
 def load_data():
-    if not os.path.exists("data"):
-        os.makedirs("data")
-
-    if not os.path.exists("data/heart.csv"):
-        os.system("kaggle datasets download -d johnsmith/heart-disease -p data")
-        with zipfile.ZipFile("data/heart-disease.zip", "r") as zip_ref:
-            zip_ref.extractall("data")
-
-    return pd.read_csv("data/heart.csv")
+    return pd.read_csv("heart.csv")
 
 df = load_data()
 
