@@ -183,7 +183,7 @@ st.pyplot(fig)
 plt.close(fig)
 
 # =========================
-# AUTOMATIC REPORT
+# AUTOMATIC REPORT (ADICIONADO)
 # =========================
 st.header("📄 Automatic Analytical Report")
 
@@ -191,7 +191,6 @@ mean_age = df["Age"].mean()
 mean_bp = df["BP"].mean()
 mean_chol = df["Cholesterol"].mean()
 
-# Heart disease prevalence (assumindo 1 = doença, 0 = saudável)
 disease_rate = df["Heart Disease"].mean() * 100
 
 report = f"""
@@ -213,6 +212,7 @@ st.download_button(
     data=report,
     file_name="heart_disease_eda_report.txt"
 )
+
 # =========================
 # FOOTER
 # =========================
