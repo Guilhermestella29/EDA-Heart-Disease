@@ -13,36 +13,34 @@ st.set_page_config(
 )
 
 # =========================
-# DATA LOADING
-# =========================
-@st.cache_data(show_spinner="Loading dataset...")
-def load_data():
-    return pd.read_csv("heart.csv")
-
-df = load_data()
-
-# =========================
-# DATA CLEANING
-# =========================
-df["Heart Disease"] = pd.to_numeric(
-    df["Heart Disease"],
-    errors="coerce"
-)
-
-# =========================
-# TITLE
+# TITLE & INTRO
 # =========================
 st.markdown(
-    "<h1 style='text-align:center;'>❤️ Heart Disease – Exploratory Data Analysis</h1>",
+    "<h1 style='text-align: center;'>❤️ Heart Disease – Exploratory Data Analysis</h1>",
     unsafe_allow_html=True
 )
 
 st.markdown(
-    "<p style='text-align:center;'>Exploratory analysis of clinical indicators related to cardiovascular disease.</p>",
+    """
+<p style='text-align: center; font-size:16px;'>
+This dashboard presents a comprehensive <b>Exploratory Data Analysis (EDA)</b> 
+of a heart disease dataset, focusing on clinical distributions, relationships,
+and potential cardiovascular risk indicators.
+</p>
+""",
     unsafe_allow_html=True
 )
 
 st.divider()
+
+# =========================
+# DATA LOADING
+# =========================
+@st.cache_data
+def load_data():
+    return pd.read_csv("heart.csv")
+
+df = load_data()
 
 # =========================
 # DATA OVERVIEW
@@ -51,35 +49,37 @@ st.header("📊 Dataset Overview")
 
 col1, col2 = st.columns(2)
 
-col1.metric("Patients", df.shape[0])
-col2.metric("Features", df.shape[1])
+with col1:
+    st.metric("Rows", df.shape[0])
+    st.metric("Columns", df.shape[1])
 
-if df["Heart Disease"].notna().any():
-    disease_rate = df["Heart Disease"].mean() * 100
-    disease_text = f"{disease_rate:.1f}%"
-else:
-    disease_text = "N/A"
-
-st.metric("Heart Disease Prevalence", disease_text)
-
-with st.expander("📄 Dataset Preview"):
+with col2:
+    st.write("Preview of the dataset:")
     st.dataframe(df.head(), use_container_width=True)
+
+# =========================
+# DESCRIPTIVE STATISTICS
+# =========================
+with st.expander("📈 Descriptive Statistics"):
+    st.dataframe(df.describe(), use_container_width=True)
 
 # =========================
 # AGE & BP ANALYSIS
 # =========================
-st.header("🎂 Age & Blood Pressure")
+st.header("🎂 Age & Blood Pressure Analysis")
 
-c1, c2 = st.columns(2)
+col1, col2 = st.columns(2)
 
-with c1:
+with col1:
     fig, ax = plt.subplots(figsize=(5, 4))
-    sns.histplot(df["Age"], bins=25, kde=True, ax=ax)
+    sns.histplot(df["Age"], bins=30, kde=True, ax=ax)
     ax.set_title("Age Distribution", loc="center")
+    ax.set_xlabel("Age")
+    ax.set_ylabel("Frequency")
     st.pyplot(fig)
     plt.close(fig)
 
-with c2:
+with col2:
     fig, ax = plt.subplots(figsize=(5, 4))
     sns.lineplot(
         x="Age",
@@ -89,33 +89,76 @@ with c2:
         ax=ax
     )
     ax.set_title("Average Blood Pressure by Age", loc="center")
+    ax.set_xlabel("Age")
+    ax.set_ylabel("Blood Pressure")
+    st.pyplot(fig)
+    plt.close(fig)
+
+# =========================
+# CLINICAL VARIABLES
+# =========================
+st.header("📊 Distribution of Clinical Variables")
+
+st.markdown(
+    "Select clinical variables to visualize their distributions:"
+)
+
+selected_columns = st.multiselect(
+    "Clinical variables",
+    options=[
+        'Age', 'BP', 'Cholesterol', 'Max HR',
+        'ST depression', 'Slope of ST',
+        'Chest pain type', 'Thallium', 'Heart Disease'
+    ],
+    default=['Age', 'BP', 'Cholesterol', 'Max HR']
+)
+
+if selected_columns:
+    n_cols = 3
+    rows = (len(selected_columns) + n_cols - 1) // n_cols
+
+    fig, axs = plt.subplots(rows, n_cols, figsize=(14, rows * 3))
+    axs = axs.flatten()
+
+    for ax, col in zip(axs, selected_columns):
+        sns.histplot(df[col], bins=30, kde=True, ax=ax)
+        ax.set_title(col, loc="center")
+        ax.set_xlabel("")
+        ax.set_ylabel("Frequency")
+
+    for ax in axs[len(selected_columns):]:
+        ax.axis("off")
+
+    plt.tight_layout()
     st.pyplot(fig)
     plt.close(fig)
 
 # =========================
 # AGE vs CHOLESTEROL
 # =========================
-st.header("🩸 Age vs Cholesterol")
+st.header("🩸 Age vs Cholesterol Relationship")
 
 fig, ax = plt.subplots(figsize=(6, 6))
 
 sns.scatterplot(
     x=df["Cholesterol"],
     y=df["Age"],
+    s=10,
     alpha=0.6,
-    s=12,
     ax=ax
 )
-
 sns.kdeplot(
     x=df["Cholesterol"],
     y=df["Age"],
-    levels=5,
+    levels=6,
     linewidths=1,
     ax=ax
 )
 
 ax.set_title("Age vs Cholesterol Density", loc="center")
+ax.set_xlabel("Cholesterol")
+ax.set_ylabel("Age")
+
 st.pyplot(fig)
 plt.close(fig)
 
@@ -126,65 +169,30 @@ st.header("🔗 Correlation Analysis")
 
 numeric_df = df.select_dtypes(include="number")
 
-with st.expander("View Correlation Heatmap"):
-    fig, ax = plt.subplots(figsize=(10, 8))
-    sns.heatmap(
-        numeric_df.corr(),
-        annot=True,
-        fmt=".2f",
-        cmap="coolwarm",
-        linewidths=0.5,
-        ax=ax
-    )
-    ax.set_title("Correlation Matrix", loc="center")
-    st.pyplot(fig)
-    plt.close(fig)
-
-# =========================
-# AUTOMATIC REPORT
-# =========================
-st.header("📄 Automatic Analytical Report")
-
-mean_age = df["Age"].mean()
-mean_bp = df["BP"].mean()
-mean_chol = df["Cholesterol"].mean()
-
-corr_target = (
-    numeric_df.corr()["Heart Disease"]
-    .sort_values(ascending=False)
-    .dropna()
+fig, ax = plt.subplots(figsize=(10, 8))
+sns.heatmap(
+    numeric_df.corr(),
+    annot=True,
+    fmt=".2f",
+    cmap="coolwarm",
+    linewidths=0.5,
+    ax=ax
 )
 
-report = f"""
-## Dataset Summary
-
-- Total patients: {df.shape[0]}
-- Heart disease prevalence: {disease_text}
-
-## Clinical Averages
-- Average age: {mean_age:.1f} years
-- Average blood pressure: {mean_bp:.1f}
-- Average cholesterol: {mean_chol:.1f}
-
-## Strongest Correlations with Heart Disease
-{corr_target.head(6).to_string()}
-"""
-
-st.markdown(report)
-
-st.download_button(
-    label="⬇️ Download Report (TXT)",
-    data=report,
-    file_name="heart_disease_eda_report.txt"
-)
+ax.set_title("Correlation Heatmap", loc="center")
+st.pyplot(fig)
+plt.close(fig)
 
 # =========================
-# FOOTER
+# CONCLUSIONS
 # =========================
+st.header("🧠 Key Insights")
+
 st.markdown(
     """
----
-This exploratory analysis provides a clear overview of cardiovascular risk factors
-and serves as a foundation for statistical modeling and predictive analytics.
+- The dataset covers a broad age range, supporting demographic analysis.
+- Blood pressure and cholesterol present relevant variability across patients.
+- Correlation patterns highlight potential predictors of heart disease.
+- This EDA provides a solid foundation for **feature engineering** and **machine learning models**.
 """
 )
