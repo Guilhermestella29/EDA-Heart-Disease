@@ -82,6 +82,41 @@ ax.set_xlabel("Age")
 ax.set_ylabel("Frequency")
 st.pyplot(fig)
 plt.close(fig)
+#---------------------------------------------------------------
+st.header("📊 Distribution of Clinical Variables")
+
+st.markdown(
+    """
+The histograms below show the distribution of the main clinical variables.
+This visualization helps identify skewness, concentration ranges, and
+potential outliers in the dataset.
+"""
+)
+
+columns = [
+    'Age',
+    'BP',
+    'Cholesterol',
+    'Max HR',
+    'ST depression',
+    'Slope of ST',
+    'Chest pain type',
+    'Thallium',
+    'Heart Disease'
+]
+
+fig, axs = plt.subplots(3, 3, figsize=(15, 10))
+
+for ax, col in zip(axs.flat, columns):
+    sns.histplot(df[col], ax=ax, bins=30, kde=True)
+    ax.set_title(col)
+    ax.set_xlabel("")
+    ax.set_ylabel("Frequency")
+
+plt.tight_layout()
+
+st.pyplot(fig)
+plt.close(fig)
 
 # =========================
 # CHOLESTEROL vs AGE
