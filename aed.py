@@ -52,7 +52,7 @@ col1, col2 = st.columns(2)
 with col1:
     st.metric("Total Observations", df.shape[0])
     st.metric("Total Variables", df.shape[1])
-    st.metric("Data Types", df.info())
+    st.dataframe("Data Types", df.info())
 
 with col2:
     st.markdown("**Dataset preview:**")
