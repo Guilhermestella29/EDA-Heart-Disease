@@ -8,7 +8,6 @@ import seaborn as sns
 # =========================
 st.set_page_config(
     page_title="Heart Disease EDA",
-    page_icon="❤️",
     layout="wide"
 )
 
@@ -16,7 +15,7 @@ st.set_page_config(
 # TITLE & INTRO
 # =========================
 st.markdown(
-    "<h1 style='text-align: center;'>❤️ Heart Disease – Exploratory Data Analysis</h1>",
+    "<h1 style='text-align: center;'> Heart Disease – Exploratory Data Analysis</h1>",
     unsafe_allow_html=True
 )
 
@@ -138,7 +137,7 @@ if selected_columns:
 # =========================
 st.header("🩸 Age vs Cholesterol Relationship")
 
-fig, ax = plt.subplots(figsize=(6, 6))
+fig, ax = plt.subplots(figsize=(3, 3))
 
 sns.scatterplot(
     x=df["Cholesterol"],
