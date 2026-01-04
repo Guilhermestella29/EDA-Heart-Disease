@@ -22,11 +22,19 @@ def load_data():
 df = load_data()
 
 # =========================
+# DATA CLEANING (CRITICAL FIX)
+# =========================
+df["Heart Disease"] = pd.to_numeric(
+    df["Heart Disease"],
+    errors="coerce"
+)
+
+# =========================
 # SIDEBAR FILTERS
 # =========================
 st.sidebar.header("🎛️ Filters")
 
-# Age
+# Age filter
 age_min, age_max = int(df["Age"].min()), int(df["Age"].max())
 age_range = st.sidebar.slider(
     "Age Range",
@@ -35,13 +43,13 @@ age_range = st.sidebar.slider(
     (age_min, age_max)
 )
 
-# Sex
+# Sex filter
 sex_option = st.sidebar.selectbox(
     "Sex",
     ["All", "Male", "Female"]
 )
 
-# Heart Disease
+# Heart Disease filter
 disease_option = st.sidebar.selectbox(
     "Heart Disease",
     ["All", "With Disease", "Without Disease"]
@@ -89,17 +97,22 @@ col1, col2, col3 = st.columns(3)
 
 col1.metric("Patients", filtered_df.shape[0])
 col2.metric("Features", filtered_df.shape[1])
-col3.metric(
-    "Heart Disease (%)",
-    f"{(filtered_df['Heart Disease'].mean() * 100):.1f}%" if len(filtered_df) > 0 else "N/A"
-)
+
+# Safe disease rate calculation
+if len(filtered_df) > 0 and filtered_df["Heart Disease"].notna().any():
+    disease_rate = filtered_df["Heart Disease"].mean() * 100
+    disease_text = f"{disease_rate:.1f}%"
+else:
+    disease_text = "N/A"
+
+col3.metric("Heart Disease (%)", disease_text)
 
 st.dataframe(filtered_df.head(), use_container_width=True)
 
 # =========================
-# AGE & BP
+# AGE & BP ANALYSIS
 # =========================
-st.header("🎂 Age & Blood Pressure")
+st.header("🎂 Age & Blood Pressure Analysis")
 
 c1, c2 = st.columns(2)
 
@@ -151,7 +164,7 @@ st.pyplot(fig)
 plt.close(fig)
 
 # =========================
-# CORRELATION
+# CORRELATION HEATMAP
 # =========================
 st.header("🔗 Correlation Heatmap")
 
@@ -177,26 +190,29 @@ plt.close(fig)
 st.header("📄 Automatic Analytical Report")
 
 total = filtered_df.shape[0]
-disease_rate = filtered_df["Heart Disease"].mean() * 100 if total > 0 else 0
 
 mean_age = filtered_df["Age"].mean()
 mean_bp = filtered_df["BP"].mean()
 mean_chol = filtered_df["Cholesterol"].mean()
 
-corr_target = numeric_df.corr()["Heart Disease"].sort_values(ascending=False)
+corr_target = (
+    numeric_df.corr()["Heart Disease"]
+    .sort_values(ascending=False)
+    .dropna()
+)
 
 report = f"""
-## 📊 Dataset Summary (Filtered)
+## Dataset Summary (Filtered)
 
-- **Total patients:** {total}
-- **Heart disease prevalence:** {disease_rate:.1f}%
+- Total patients: {total}
+- Heart disease prevalence: {disease_text}
 
-## 🧪 Clinical Averages
-- **Average age:** {mean_age:.1f} years
-- **Average blood pressure:** {mean_bp:.1f}
-- **Average cholesterol:** {mean_chol:.1f}
+## Clinical Averages
+- Average age: {mean_age:.1f} years
+- Average blood pressure: {mean_bp:.1f}
+- Average cholesterol: {mean_chol:.1f}
 
-## 🔗 Strongest Correlations with Heart Disease
+## Strongest Correlations with Heart Disease
 {corr_target.head(6).to_string()}
 """
 
@@ -214,7 +230,7 @@ st.download_button(
 st.markdown(
     """
 ---
-**This dashboard supports data-driven insights for cardiovascular risk analysis
-and serves as a foundation for predictive modeling and clinical decision support.**
+This dashboard supports data-driven insights for cardiovascular risk analysis
+and serves as a foundation for predictive modeling.
 """
 )
