@@ -191,12 +191,6 @@ mean_age = df["Age"].mean()
 mean_bp = df["BP"].mean()
 mean_chol = df["Cholesterol"].mean()
 
-corr_target = (
-    numeric_df.corr()["Heart Disease"]
-    .sort_values(ascending=False)
-    .dropna()
-)
-
 report = f"""
 ## Dataset Summary
 
@@ -208,9 +202,6 @@ report = f"""
 - Average blood pressure: {mean_bp:.1f}
 - Average cholesterol: {mean_chol:.1f}
 
-## Strongest Correlations with Heart Disease
-{corr_target.head(6).to_string()}
-"""
 
 st.markdown(report)
 
