@@ -191,17 +191,20 @@ mean_age = df["Age"].mean()
 mean_bp = df["BP"].mean()
 mean_chol = df["Cholesterol"].mean()
 
+# Heart disease prevalence (assumindo 1 = doença, 0 = saudável)
+disease_rate = df["Heart Disease"].mean() * 100
+
 report = f"""
 ## Dataset Summary
 
 - Total patients: {df.shape[0]}
-- Heart disease prevalence: {disease_text}
+- Heart disease prevalence: {disease_rate:.1f}%
 
 ## Clinical Averages
 - Average age: {mean_age:.1f} years
 - Average blood pressure: {mean_bp:.1f}
 - Average cholesterol: {mean_chol:.1f}
-
+"""
 
 st.markdown(report)
 
@@ -210,7 +213,6 @@ st.download_button(
     data=report,
     file_name="heart_disease_eda_report.txt"
 )
-
 # =========================
 # FOOTER
 # =========================
