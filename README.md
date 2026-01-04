@@ -3,7 +3,7 @@
 This project presents an **Exploratory Data Analysis (EDA)** of a heart disease dataset using **Python** and **Streamlit**.  
 The goal is to analyze clinical variables, visualize relationships, and extract insights that may help understand cardiovascular risk patterns.
 
-👉  [**Live App:**](https://eda-heart-disease-inwh7rentomffqx6zbjs5y.streamlit.app/)  
+👉  [**Live App**](https://eda-heart-disease-inwh7rentomffqx6zbjs5y.streamlit.app/)  
 
 ---
 
