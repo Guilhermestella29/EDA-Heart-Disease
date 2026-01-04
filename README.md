@@ -2,9 +2,9 @@
 
 This project presents an **Exploratory Data Analysis (EDA)** of a heart disease dataset using **Python, Streamlit, Pandas, Matplotlib, and Seaborn**.  
 The goal is to explore clinical variables, identify patterns, and support future predictive modeling.
+---
 
-[preview link](https://eda-heart-disease-inwh7rentomffqx6zbjs5y.streamlit.app)
-/ 
+[Heart Disease EDA](https://eda-heart-disease-inwh7rentomffqx6zbjs5y.streamlit.app)
 
 ---
 
