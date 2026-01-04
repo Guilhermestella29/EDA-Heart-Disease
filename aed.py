@@ -22,7 +22,7 @@ def load_data():
 df = load_data()
 
 # =========================
-# DATA CLEANING (CRITICAL FIX)
+# DATA CLEANING
 # =========================
 df["Heart Disease"] = pd.to_numeric(
     df["Heart Disease"],
@@ -30,43 +30,19 @@ df["Heart Disease"] = pd.to_numeric(
 )
 
 # =========================
-# SIDEBAR FILTERS
+# SIDEBAR FILTER
 # =========================
-st.sidebar.header("🎛️ Filters")
+st.sidebar.header("🎛️ Filter")
 
-# Age filter
-age_min, age_max = int(df["Age"].min()), int(df["Age"].max())
-age_range = st.sidebar.slider(
-    "Age Range",
-    age_min,
-    age_max,
-    (age_min, age_max)
-)
-
-# Sex filter
-sex_option = st.sidebar.selectbox(
-    "Sex",
-    ["All", "Male", "Female"]
-)
-
-# Heart Disease filter
 disease_option = st.sidebar.selectbox(
     "Heart Disease",
     ["All", "With Disease", "Without Disease"]
 )
 
 # =========================
-# APPLY FILTERS
+# APPLY FILTER
 # =========================
-filtered_df = df[
-    (df["Age"] >= age_range[0]) &
-    (df["Age"] <= age_range[1])
-]
-
-if sex_option == "Male":
-    filtered_df = filtered_df[filtered_df["Sex"] == 1]
-elif sex_option == "Female":
-    filtered_df = filtered_df[filtered_df["Sex"] == 0]
+filtered_df = df.copy()
 
 if disease_option == "With Disease":
     filtered_df = filtered_df[filtered_df["Heart Disease"] == 1]
@@ -82,7 +58,7 @@ st.markdown(
 )
 
 st.markdown(
-    "<p style='text-align:center;'>Interactive dashboard with demographic, clinical and outcome filters.</p>",
+    "<p style='text-align:center;'>Exploratory analysis focused on clinical patterns and cardiovascular outcomes.</p>",
     unsafe_allow_html=True
 )
 
@@ -91,14 +67,13 @@ st.divider()
 # =========================
 # DATA OVERVIEW
 # =========================
-st.header("📊 Dataset Overview (Filtered)")
+st.header("📊 Dataset Overview")
 
 col1, col2, col3 = st.columns(3)
 
 col1.metric("Patients", filtered_df.shape[0])
 col2.metric("Features", filtered_df.shape[1])
 
-# Safe disease rate calculation
 if len(filtered_df) > 0 and filtered_df["Heart Disease"].notna().any():
     disease_rate = filtered_df["Heart Disease"].mean() * 100
     disease_text = f"{disease_rate:.1f}%"
@@ -112,7 +87,7 @@ st.dataframe(filtered_df.head(), use_container_width=True)
 # =========================
 # AGE & BP ANALYSIS
 # =========================
-st.header("🎂 Age & Blood Pressure Analysis")
+st.header("🎂 Age & Blood Pressure")
 
 c1, c2 = st.columns(2)
 
@@ -202,7 +177,7 @@ corr_target = (
 )
 
 report = f"""
-## Dataset Summary (Filtered)
+## Dataset Summary
 
 - Total patients: {total}
 - Heart disease prevalence: {disease_text}
@@ -230,7 +205,7 @@ st.download_button(
 st.markdown(
     """
 ---
-This dashboard supports data-driven insights for cardiovascular risk analysis
-and serves as a foundation for predictive modeling.
+This dashboard provides a clear exploratory view of cardiovascular risk factors
+and supports further statistical and predictive analysis.
 """
 )
