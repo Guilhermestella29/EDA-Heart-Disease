@@ -137,7 +137,7 @@ if selected_columns:
 # =========================
 st.header("🩸 Age vs Cholesterol Relationship")
 
-fig, ax = plt.subplots(figsize=(3, 3))
+fig, ax = plt.subplots(figsize=(6, 6))
 
 sns.scatterplot(
     x=df["Cholesterol"],
@@ -181,6 +181,55 @@ sns.heatmap(
 ax.set_title("Correlation Heatmap", loc="center")
 st.pyplot(fig)
 plt.close(fig)
+
+# =========================
+# AUTOMATIC REPORT
+# =========================
+st.header("📄 Automatic Analytical Report")
+
+mean_age = df["Age"].mean()
+mean_bp = df["BP"].mean()
+mean_chol = df["Cholesterol"].mean()
+
+corr_target = (
+    numeric_df.corr()["Heart Disease"]
+    .sort_values(ascending=False)
+    .dropna()
+)
+
+report = f"""
+## Dataset Summary
+
+- Total patients: {df.shape[0]}
+- Heart disease prevalence: {disease_text}
+
+## Clinical Averages
+- Average age: {mean_age:.1f} years
+- Average blood pressure: {mean_bp:.1f}
+- Average cholesterol: {mean_chol:.1f}
+
+## Strongest Correlations with Heart Disease
+{corr_target.head(6).to_string()}
+"""
+
+st.markdown(report)
+
+st.download_button(
+    label="⬇️ Download Report (TXT)",
+    data=report,
+    file_name="heart_disease_eda_report.txt"
+)
+
+# =========================
+# FOOTER
+# =========================
+st.markdown(
+    """
+---
+This exploratory analysis provides a clear overview of cardiovascular risk factors
+and serves as a foundation for statistical modeling and predictive analytics.
+"""
+)
 
 # =========================
 # CONCLUSIONS
