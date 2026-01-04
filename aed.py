@@ -1,24 +1,32 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
-import zipfile
-import os
-
-st.set_page_config(page_title="Heart Disease Analysis", layout="wide")
-
-st.title("❤️ Heart Disease – Análise Exploratória de Dados")
-st.markdown("Análise interativa baseada no dataset de predição de doenças cardíacas.")
 
 # =========================
-# CONFIGURAÇÃO KAGGLE
+# PAGE CONFIGURATION
 # =========================
-os.environ["KAGGLE_USERNAME"] = st.secrets["KAGGLE_USERNAME"]
-os.environ["KAGGLE_KEY"] = st.secrets["KAGGLE_KEY"]
+st.set_page_config(
+    page_title="Heart Disease Exploratory Data Analysis",
+    layout="wide"
+)
 
 # =========================
-# CARREGAMENTO DOS DADOS
+# TITLE & INTRODUCTION
+# =========================
+st.title("❤️ Heart Disease – Exploratory Data Analysis (EDA)")
+
+st.markdown(
+    """
+This application presents an **exploratory data analysis (EDA)** of a heart disease dataset.
+The goal is to understand variable distributions, relationships between clinical indicators,
+and potential patterns related to cardiovascular risk.
+"""
+)
+
+# =========================
+# DATA LOADING
 # =========================
 @st.cache_data
 def load_data():
@@ -26,28 +34,142 @@ def load_data():
 
 df = load_data()
 
-st.subheader("📊 Visão geral dos dados")
+# =========================
+# DATA OVERVIEW
+# =========================
+st.header("📊 Dataset Overview")
+
+st.markdown(
+    """
+This section provides a high-level view of the dataset, including its structure,
+dimensions, and the first observations.
+"""
+)
+
+st.write("**Dataset shape:**", df.shape)
 st.dataframe(df.head())
-st.write("Dimensão do dataset:", df.shape)
-#----------------------------------------------------------------- Age vs Cholestereol  ---------------------
-st.subheader("📈 Age vs Cholesterol Distribution")
+
+# =========================
+# DESCRIPTIVE STATISTICS
+# =========================
+st.header("📈 Descriptive Statistics")
+
+st.markdown(
+    """
+Descriptive statistics summarize the central tendency, dispersion, and range
+of numerical variables in the dataset.
+"""
+)
+
+st.dataframe(df.describe())
+
+# =========================
+# DISTRIBUTION OF AGE
+# =========================
+st.header("🎂 Age Distribution")
+
+st.markdown(
+    """
+The age distribution helps identify the population profile included in the dataset
+and possible age concentrations related to heart disease risk.
+"""
+)
+
+fig, ax = plt.subplots(figsize=(8, 5))
+sns.histplot(df["Age"], bins=30, kde=True, color="steelblue", ax=ax)
+ax.set_title("Age Distribution")
+ax.set_xlabel("Age")
+ax.set_ylabel("Frequency")
+st.pyplot(fig)
+plt.close(fig)
+
+# =========================
+# CHOLESTEROL vs AGE
+# =========================
+st.header("🩸 Age vs Cholesterol")
+
+st.markdown(
+    """
+This visualization combines scatter points, density estimation, and contour lines
+to analyze the relationship between **age** and **cholesterol levels**.
+"""
+)
 
 x = df["Cholesterol"]
 y = df["Age"]
 
 fig, ax = plt.subplots(figsize=(8, 8))
 
-sns.scatterplot(x=x, y=y, s=6, color="black", alpha=0.8, ax=ax)
+sns.scatterplot(x=x, y=y, s=6, color="black", alpha=0.7, ax=ax)
 sns.histplot(x=x, y=y, bins=60, pthresh=0.05, cmap="rocket", cbar=True, ax=ax)
 sns.kdeplot(x=x, y=y, levels=8, color="blue", linewidths=1.2, ax=ax)
 
+ax.set_title("Age vs Cholesterol Distribution")
 ax.set_xlabel("Cholesterol")
 ax.set_ylabel("Age")
-ax.set_title("Age vs Cholesterol Distribution")
 
 st.pyplot(fig)
 plt.close(fig)
 
+# =========================
+# BLOOD PRESSURE ANALYSIS
+# =========================
+st.header("💉 Blood Pressure Analysis")
 
+st.markdown(
+    """
+Blood pressure is a key clinical indicator for cardiovascular diseases.
+The distribution below shows how systolic blood pressure values are spread across patients.
+"""
+)
 
+fig, ax = plt.subplots(figsize=(8, 5))
+sns.histplot(df["BP"], bins=30, kde=True, color="darkred", ax=ax)
+ax.set_title("Blood Pressure Distribution")
+ax.set_xlabel("Blood Pressure")
+ax.set_ylabel("Frequency")
+st.pyplot(fig)
+plt.close(fig)
 
+# =========================
+# CORRELATION HEATMAP
+# =========================
+st.header("🔗 Correlation Analysis")
+
+st.markdown(
+    """
+The correlation heatmap highlights linear relationships between numerical variables.
+Strong positive or negative correlations may indicate relevant clinical associations.
+"""
+)
+
+numeric_data = df.select_dtypes(include="number")
+corr = numeric_data.corr()
+
+fig, ax = plt.subplots(figsize=(14, 12))
+sns.heatmap(
+    corr,
+    annot=True,
+    fmt=".2f",
+    cmap="coolwarm",
+    linewidths=0.5,
+    ax=ax
+)
+ax.set_title("Correlation Heatmap")
+
+st.pyplot(fig)
+plt.close(fig)
+
+# =========================
+# CONCLUSION
+# =========================
+st.header("🧠 Key Insights")
+
+st.markdown(
+    """
+- The dataset presents a wide age range, allowing meaningful demographic analysis.
+- Cholesterol and blood pressure show relevant variability across patients.
+- Correlation analysis helps identify potential predictors for heart disease risk.
+- These insights can support further **feature selection**, **statistical analysis**, or **machine learning modeling**.
+"""
+)
