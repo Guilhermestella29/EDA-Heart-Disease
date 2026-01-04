@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+import zipfile
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -13,10 +15,15 @@ st.markdown("Análise interativa baseada no dataset de predição de doenças ca
 # Carregamento dos dados
 # =========================
 @st.cache_data
-def load_data():
-    return pd.read_csv("Heart_Disease_Prediction.csv")
 
-df = load_data()
+os.environ["KAGGLE_USERNAME"] = st.secrets["KAGGLE_USERNAME"]
+os.environ["KAGGLE_KEY"] = st.secrets["KAGGLE_KEY"]
+
+os.system("kaggle datasets download -d johnsmith/heart-disease")
+with zipfile.ZipFile("heart-disease.zip", "r") as zip_ref:
+    zip_ref.extractall("data")
+
+df = pd.read_csv("data/heart.csv")
 
 st.subheader("📊 Visão geral dos dados")
 st.write(df.head())
