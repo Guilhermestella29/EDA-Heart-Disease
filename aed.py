@@ -26,3 +26,20 @@ df = load_data()
 st.subheader("📊 Visão geral dos dados")
 st.dataframe(df.head())
 st.write("Dimensão do dataset:", df.shape)
+#----------------------------------------------------------------- Age vs Cholestereol  ---------------------
+x = df['Cholesterol']
+y = df['Age']
+
+fig, ax = plt.subplots(figsize=(8, 8))
+
+sns.scatterplot(x=x, y=y, s=6, color="black", alpha=0.8, ax=ax)
+sns.histplot(x=x, y=y, bins=60, pthresh=0.05, cmap="rocket", cbar=True, ax=ax)
+sns.kdeplot(x=x, y=y, levels=8, color="blue", linewidths=1.2, ax=ax)
+
+ax.set_title("Age vs Cholesterol Distribution")
+
+plt.show()
+
+
+
+
