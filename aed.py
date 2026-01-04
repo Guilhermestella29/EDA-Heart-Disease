@@ -15,16 +15,17 @@ st.set_page_config(
 # TITLE & INTRO
 # =========================
 st.markdown(
-    "<h1 style='text-align: center;'> Heart Disease – Exploratory Data Analysis</h1>",
+    "<h1 style='text-align: center;'>Heart Disease – Exploratory Data Analysis</h1>",
     unsafe_allow_html=True
 )
 
 st.markdown(
     """
 <p style='text-align: center; font-size:16px;'>
-This dashboard presents a comprehensive <b>Exploratory Data Analysis (EDA)</b> 
-of a heart disease dataset, focusing on clinical distributions, relationships,
-and potential cardiovascular risk indicators.
+This dashboard presents a detailed <b>Exploratory Data Analysis (EDA)</b> of a heart disease dataset.
+The objective is to understand the <b>statistical behavior</b>, <b>clinical variability</b>, and 
+<b>relationships among cardiovascular risk factors</b>, providing a solid analytical foundation 
+for predictive modeling.
 </p>
 """,
     unsafe_allow_html=True
@@ -44,22 +45,32 @@ df = load_data()
 # =========================
 # DATA OVERVIEW
 # =========================
-st.header("📊 Dataset Overview")
+st.header("📊 Statistical Overview of the Dataset")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.metric("Rows", df.shape[0])
-    st.metric("Columns", df.shape[1])
+    st.metric("Total Observations", df.shape[0])
+    st.metric("Total Variables", df.shape[1])
 
 with col2:
-    st.write("Preview of the dataset:")
+    st.markdown("**Dataset preview:**")
     st.dataframe(df.head(), use_container_width=True)
 
 # =========================
 # DESCRIPTIVE STATISTICS
 # =========================
-with st.expander("📈 Descriptive Statistics"):
+st.header("📈 Descriptive Statistical Analysis")
+
+st.markdown(
+    """
+Descriptive statistics summarize central tendency, dispersion, and value ranges
+for numerical variables, enabling early detection of variability and outliers
+in clinical measurements.
+"""
+)
+
+with st.expander("View Descriptive Statistics"):
     st.dataframe(df.describe(), use_container_width=True)
 
 # =========================
@@ -72,7 +83,7 @@ col1, col2 = st.columns(2)
 with col1:
     fig, ax = plt.subplots(figsize=(5, 4))
     sns.histplot(df["Age"], bins=30, kde=True, ax=ax)
-    ax.set_title("Age Distribution", loc="center")
+    ax.set_title("Age Distribution")
     ax.set_xlabel("Age")
     ax.set_ylabel("Frequency")
     st.pyplot(fig)
@@ -87,23 +98,49 @@ with col2:
         data=df,
         ax=ax
     )
-    ax.set_title("Average Blood Pressure by Age", loc="center")
+    ax.set_title("Average Blood Pressure by Age")
     ax.set_xlabel("Age")
     ax.set_ylabel("Blood Pressure")
     st.pyplot(fig)
     plt.close(fig)
+
+st.info(
+    "🔎 **Interpretation:** Age presents a broad distribution, and average blood pressure "
+    "tends to vary with age, reinforcing its relevance as a cardiovascular risk factor."
+)
+
+# =========================
+# AGE vs HEART DISEASE (BOXPLOT)
+# =========================
+st.header("❤️ Age Distribution by Heart Disease Outcome")
+
+fig, ax = plt.subplots(figsize=(6, 4))
+sns.boxplot(
+    x='Heart Disease',
+    y='Age',
+    data=df,
+    ax=ax
+)
+
+ax.set_xlabel("Heart Disease (0 = No, 1 = Yes)")
+ax.set_ylabel("Age")
+ax.set_title("Age Distribution by Heart Disease Status")
+
+st.pyplot(fig)
+plt.close(fig)
+
+st.info(
+    "🔎 **Interpretation:** Patients diagnosed with heart disease tend to show a higher "
+    "median age, suggesting age as a strong contributing factor in cardiovascular risk."
+)
 
 # =========================
 # CLINICAL VARIABLES
 # =========================
 st.header("📊 Distribution of Clinical Variables")
 
-st.markdown(
-    "Select clinical variables to visualize their distributions:"
-)
-
 selected_columns = st.multiselect(
-    "Clinical variables",
+    "Select clinical variables:",
     options=[
         'Age', 'BP', 'Cholesterol', 'Max HR',
         'ST depression', 'Slope of ST',
@@ -121,7 +158,7 @@ if selected_columns:
 
     for ax, col in zip(axs, selected_columns):
         sns.histplot(df[col], bins=30, kde=True, ax=ax)
-        ax.set_title(col, loc="center")
+        ax.set_title(col)
         ax.set_xlabel("")
         ax.set_ylabel("Frequency")
 
@@ -146,6 +183,7 @@ sns.scatterplot(
     alpha=0.6,
     ax=ax
 )
+
 sns.kdeplot(
     x=df["Cholesterol"],
     y=df["Age"],
@@ -154,12 +192,52 @@ sns.kdeplot(
     ax=ax
 )
 
-ax.set_title("Age vs Cholesterol Density", loc="center")
+ax.set_title("Age vs Cholesterol Density")
 ax.set_xlabel("Cholesterol")
 ax.set_ylabel("Age")
 
 st.pyplot(fig)
 plt.close(fig)
+
+st.info(
+    "🔎 **Interpretation:** Cholesterol values are widely distributed across age groups, "
+    "with higher-density regions indicating common patient profiles rather than a strict linear trend."
+)
+
+# =========================
+# BP vs CHOLESTEROL BINS (VIOLIN + HUE)
+# =========================
+st.header("🩺 Blood Pressure Across Cholesterol Levels and Heart Disease")
+
+bp_age = df[['Cholesterol', 'BP', 'Heart Disease']].copy()
+bp_age['Cholesterol_bins'] = pd.cut(
+    bp_age['Cholesterol'],
+    bins=5,
+    labels=False
+)
+
+fig, ax = plt.subplots(figsize=(7, 4))
+sns.violinplot(
+    x='Cholesterol_bins',
+    y='BP',
+    hue='Heart Disease',
+    data=bp_age,
+    split=True,
+    ax=ax
+)
+
+ax.set_xlabel("Cholesterol Bins (Low → High)")
+ax.set_ylabel("Blood Pressure")
+ax.set_title("Blood Pressure Distribution by Cholesterol Level and Heart Disease")
+
+st.pyplot(fig)
+plt.close(fig)
+
+st.info(
+    "🔎 **Interpretation:** Across higher cholesterol bins, patients with heart disease "
+    "tend to exhibit greater blood pressure dispersion and higher central values, "
+    "suggesting a combined effect of cholesterol and blood pressure on cardiovascular risk."
+)
 
 # =========================
 # CORRELATION HEATMAP
@@ -178,62 +256,34 @@ sns.heatmap(
     ax=ax
 )
 
-ax.set_title("Correlation Heatmap", loc="center")
+ax.set_title("Correlation Heatmap")
 st.pyplot(fig)
 plt.close(fig)
 
-# =========================
-# AUTOMATIC REPORT (ADICIONADO)
-# =========================
-st.header("📄 Automatic Analytical Report")
-
-mean_age = df["Age"].mean()
-mean_bp = df["BP"].mean()
-mean_chol = df["Cholesterol"].mean()
-
-disease_rate = df["Heart Disease"].mean() * 100
-
-report = f"""
-## Dataset Summary
-
-- Total patients: {df.shape[0]}
-- Heart disease prevalence: {disease_rate:.1f}%
-
-## Clinical Averages
-- Average age: {mean_age:.1f} years
-- Average blood pressure: {mean_bp:.1f}
-- Average cholesterol: {mean_chol:.1f}
-"""
-
-st.markdown(report)
-
-st.download_button(
-    label="⬇️ Download Report (TXT)",
-    data=report,
-    file_name="heart_disease_eda_report.txt"
-)
-
-# =========================
-# FOOTER
-# =========================
-st.markdown(
-    """
----
-This exploratory analysis provides a clear overview of cardiovascular risk factors
-and serves as a foundation for statistical modeling and predictive analytics.
-"""
+st.info(
+    "🔎 **Interpretation:** Several clinical variables show moderate correlations, "
+    "highlighting potential predictors while reinforcing the need to address multicollinearity."
 )
 
 # =========================
 # CONCLUSIONS
 # =========================
-st.header("🧠 Key Insights")
+st.header("🧠 Key Insights and Conclusions")
 
 st.markdown(
     """
-- The dataset covers a broad age range, supporting demographic analysis.
-- Blood pressure and cholesterol present relevant variability across patients.
-- Correlation patterns highlight potential predictors of heart disease.
-- This EDA provides a solid foundation for **feature engineering** and **machine learning models**.
+- Age, blood pressure, and cholesterol demonstrate meaningful variability across patients.
+- Visual comparisons reveal clear differences between patients with and without heart disease.
+- Combined distribution analyses strengthen clinical interpretability.
+- This EDA establishes a strong foundation for **feature engineering**, **classification models**, 
+  and **cardiovascular risk prediction**.
+"""
+)
+
+st.markdown(
+    """
+---
+This project demonstrates how structured exploratory analysis supports
+data-driven insights in healthcare analytics.
 """
 )
