@@ -30,26 +30,6 @@ df["Heart Disease"] = pd.to_numeric(
 )
 
 # =========================
-# SIDEBAR FILTER
-# =========================
-st.sidebar.header("🎛️ Filter")
-
-disease_option = st.sidebar.selectbox(
-    "Heart Disease",
-    ["All", "With Disease", "Without Disease"]
-)
-
-# =========================
-# APPLY FILTER
-# =========================
-filtered_df = df.copy()
-
-if disease_option == "With Disease":
-    filtered_df = filtered_df[filtered_df["Heart Disease"] == 1]
-elif disease_option == "Without Disease":
-    filtered_df = filtered_df[filtered_df["Heart Disease"] == 0]
-
-# =========================
 # TITLE
 # =========================
 st.markdown(
@@ -58,7 +38,7 @@ st.markdown(
 )
 
 st.markdown(
-    "<p style='text-align:center;'>Exploratory analysis focused on clinical patterns and cardiovascular outcomes.</p>",
+    "<p style='text-align:center;'>Exploratory analysis of clinical indicators related to cardiovascular disease.</p>",
     unsafe_allow_html=True
 )
 
@@ -69,20 +49,21 @@ st.divider()
 # =========================
 st.header("📊 Dataset Overview")
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 
-col1.metric("Patients", filtered_df.shape[0])
-col2.metric("Features", filtered_df.shape[1])
+col1.metric("Patients", df.shape[0])
+col2.metric("Features", df.shape[1])
 
-if len(filtered_df) > 0 and filtered_df["Heart Disease"].notna().any():
-    disease_rate = filtered_df["Heart Disease"].mean() * 100
+if df["Heart Disease"].notna().any():
+    disease_rate = df["Heart Disease"].mean() * 100
     disease_text = f"{disease_rate:.1f}%"
 else:
     disease_text = "N/A"
 
-col3.metric("Heart Disease (%)", disease_text)
+st.metric("Heart Disease Prevalence", disease_text)
 
-st.dataframe(filtered_df.head(), use_container_width=True)
+with st.expander("📄 Dataset Preview"):
+    st.dataframe(df.head(), use_container_width=True)
 
 # =========================
 # AGE & BP ANALYSIS
@@ -93,7 +74,7 @@ c1, c2 = st.columns(2)
 
 with c1:
     fig, ax = plt.subplots(figsize=(5, 4))
-    sns.histplot(filtered_df["Age"], bins=25, kde=True, ax=ax)
+    sns.histplot(df["Age"], bins=25, kde=True, ax=ax)
     ax.set_title("Age Distribution", loc="center")
     st.pyplot(fig)
     plt.close(fig)
@@ -104,7 +85,7 @@ with c2:
         x="Age",
         y="BP",
         estimator="mean",
-        data=filtered_df,
+        data=df,
         ax=ax
     )
     ax.set_title("Average Blood Pressure by Age", loc="center")
@@ -119,16 +100,16 @@ st.header("🩸 Age vs Cholesterol")
 fig, ax = plt.subplots(figsize=(6, 6))
 
 sns.scatterplot(
-    x=filtered_df["Cholesterol"],
-    y=filtered_df["Age"],
+    x=df["Cholesterol"],
+    y=df["Age"],
     alpha=0.6,
     s=12,
     ax=ax
 )
 
 sns.kdeplot(
-    x=filtered_df["Cholesterol"],
-    y=filtered_df["Age"],
+    x=df["Cholesterol"],
+    y=df["Age"],
     levels=5,
     linewidths=1,
     ax=ax
@@ -141,34 +122,32 @@ plt.close(fig)
 # =========================
 # CORRELATION HEATMAP
 # =========================
-st.header("🔗 Correlation Heatmap")
+st.header("🔗 Correlation Analysis")
 
-numeric_df = filtered_df.select_dtypes(include="number")
+numeric_df = df.select_dtypes(include="number")
 
-fig, ax = plt.subplots(figsize=(10, 8))
-sns.heatmap(
-    numeric_df.corr(),
-    annot=True,
-    fmt=".2f",
-    cmap="coolwarm",
-    linewidths=0.5,
-    ax=ax
-)
-
-ax.set_title("Correlation Matrix", loc="center")
-st.pyplot(fig)
-plt.close(fig)
+with st.expander("View Correlation Heatmap"):
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(
+        numeric_df.corr(),
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm",
+        linewidths=0.5,
+        ax=ax
+    )
+    ax.set_title("Correlation Matrix", loc="center")
+    st.pyplot(fig)
+    plt.close(fig)
 
 # =========================
 # AUTOMATIC REPORT
 # =========================
 st.header("📄 Automatic Analytical Report")
 
-total = filtered_df.shape[0]
-
-mean_age = filtered_df["Age"].mean()
-mean_bp = filtered_df["BP"].mean()
-mean_chol = filtered_df["Cholesterol"].mean()
+mean_age = df["Age"].mean()
+mean_bp = df["BP"].mean()
+mean_chol = df["Cholesterol"].mean()
 
 corr_target = (
     numeric_df.corr()["Heart Disease"]
@@ -179,7 +158,7 @@ corr_target = (
 report = f"""
 ## Dataset Summary
 
-- Total patients: {total}
+- Total patients: {df.shape[0]}
 - Heart disease prevalence: {disease_text}
 
 ## Clinical Averages
@@ -205,7 +184,7 @@ st.download_button(
 st.markdown(
     """
 ---
-This dashboard provides a clear exploratory view of cardiovascular risk factors
-and supports further statistical and predictive analysis.
+This exploratory analysis provides a clear overview of cardiovascular risk factors
+and serves as a foundation for statistical modeling and predictive analytics.
 """
 )
